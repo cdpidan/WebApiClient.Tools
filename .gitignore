@@ -26,6 +26,9 @@ bld/
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
+.idea/
+.vs/
+.vscode/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -260,3 +263,4 @@ paket-files/
 __pycache__/
 *.pyc
 /WebApiClient.Tools.Swagger/output/WebApiClient.Tools.Swagger
+/WebApiClient.Tools.Swagger/output

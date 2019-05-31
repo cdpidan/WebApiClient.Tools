@@ -21,6 +21,12 @@ namespace WebApiClient.Tools.Swagger
         public string Namespace { get; set; }
 
         /// <summary>
+        /// 代码的命名空间
+        /// </summary>
+        [Option('t', "task", MetaValue = "TaskReturnType", Required = false, HelpText = "Task返回值类型，如: ITask、Task")]
+        public string TaskReturnType { get; set; }
+
+        /// <summary>
         /// 返回使用帮助
         /// </summary>
         /// <returns></returns>

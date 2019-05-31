@@ -17,20 +17,19 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 获取接口名称
         /// </summary>
-        public string TypeName { get; private set; }
+        public string TypeName { get; }
 
         /// <summary>
         /// 获取文档描述
         /// </summary>
-        public string Summary { get; private set; }
+        public string Summary { get; }
 
         /// <summary>
         /// 获取是否有文档描述
         /// </summary>
-        public bool HasSummary
-        {
-            get => string.IsNullOrEmpty(Summary) == false;
-        }
+        public bool HasSummary => string.IsNullOrEmpty(Summary) == false;
+
+        public new  string AspNetNamespace { get; }
 
         /// <summary>
         /// WebApiClient的接口数据模型
@@ -39,14 +38,15 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="operations">swagger操作</param>
         /// <param name="document">swagger文档</param>
         /// <param name="settings">设置项</param>
-        public HttpApi(string className, IEnumerable<CSharpOperationModel> operations, SwaggerDocument document, HttpApiSettings settings)
-            : base(className, operations, document, settings)
+        public HttpApi(string className, IEnumerable<CSharpOperationModel> operations, SwaggerDocument document,
+            HttpApiSettings settings) : base(className, operations, document, settings)
         {
             var tag = document.Tags
                 .FirstOrDefault(item => string.Equals(item.Name, className, StringComparison.OrdinalIgnoreCase));
 
-            this.TypeName = $"I{this.Class}Api";
-            this.Summary = tag?.Description;
+            TypeName = $"I{Class}Api";
+            Summary = tag?.Description;
+            AspNetNamespace = settings.AspNetNamespace;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace WebApiClient.Tools.Swagger
         {
             var cshtml = CSharpHtml.Views<HttpApi>();
             var source = cshtml.RenderText(this);
-            return new CSharpCode(source, this.TypeName, CodeArtifactType.Interface).ToString();
+            return new CSharpCode(source, TypeName, CodeArtifactType.Interface).ToString();
         }
     }
 }

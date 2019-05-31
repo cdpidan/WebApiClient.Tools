@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
@@ -13,6 +12,8 @@ namespace WebApiClient.Tools.Swagger
     /// </summary>
     public class HttpApiMethod : CSharpOperationModel
     {
+        private readonly string _settingsTaskReturnType;
+        
         /// <summary>
         /// WebApiClient的请求方法数据模型
         /// </summary>
@@ -20,24 +21,22 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="settings">设置项</param>
         /// <param name="generator">代码生成器</param>
         /// <param name="resolver">语法解析器</param>
-        public HttpApiMethod(SwaggerOperation operation, SwaggerToCSharpGeneratorSettings settings, SwaggerToCSharpGeneratorBase generator, CSharpTypeResolver resolver)
+        /// <param name="settingsTaskReturnType"></param>
+        public HttpApiMethod(SwaggerOperation operation, SwaggerToCSharpGeneratorSettings settings,
+            SwaggerToCSharpGeneratorBase generator, CSharpTypeResolver resolver, string settingsTaskReturnType)
             : base(operation, settings, generator, resolver)
         {
+            _settingsTaskReturnType = settingsTaskReturnType;
         }
 
         /// <summary>
         /// 获取方法的返回类型
         /// 默认使用ITask
         /// </summary>
-        public override string ResultType
-        {
-            get
-            {
-                return this.SyncResultType == "void"
-                    ? "ITask<HttpResponseMessage>"
-                    : $"ITask<{this.SyncResultType}>";
-            }
-        }
+        public override string ResultType =>
+            SyncResultType == "void"
+                ? $"{_settingsTaskReturnType}<HttpResponseMessage>"
+                : $"{_settingsTaskReturnType}<{SyncResultType}>";
 
         /// <summary>
         /// 获取方法好友名称
@@ -52,7 +51,7 @@ namespace WebApiClient.Tools.Swagger
                     return name;
                 }
 
-                name = Regex.Match(this.Id, @"\w*").Value;
+                name = Regex.Match(Id, @"\w*").Value;
                 if (string.IsNullOrEmpty(name))
                 {
                     name = "unnamed";

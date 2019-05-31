@@ -17,7 +17,6 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 返回Views下的cshtml
         /// </summary>
-        /// <param name="name">cshtml名称</param>
         /// <exception cref="FileNotFoundException"></exception>
         /// <returns></returns>
         public static CSharpHtml<T> Views<T>()
@@ -53,22 +52,22 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 模板内容
         /// </summary>
-        private readonly Lazy<string> template;
+        private readonly Lazy<string> _template;
 
         /// <summary>
         /// 获取模板内容
         /// </summary>
-        public string Template => this.template.Value;
+        public string Template => _template.Value;
 
         /// <summary>
         /// 获取模板文件路径
         /// </summary>
-        public string TemplateFile { get; private set; }
+        public string TemplateFile { get; }
 
         /// <summary>
         /// 块元素
         /// </summary>
-        public HashSet<string> BlockElements { get; private set; }
+        public HashSet<string> BlockElements { get; }
 
         /// <summary>
         /// 视图模板
@@ -93,9 +92,9 @@ namespace WebApiClient.Tools.Swagger
                 throw new FileNotFoundException(path);
             }
 
-            this.template = new Lazy<string>(this.ReadTemplate);
-            this.TemplateFile = Path.GetFullPath(path);
-            this.BlockElements = new HashSet<string>(new[] { "p", "div" }, StringComparer.OrdinalIgnoreCase);
+            _template = new Lazy<string>(ReadTemplate);
+            TemplateFile = Path.GetFullPath(path);
+            BlockElements = new HashSet<string>(new[] {"p", "div"}, StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -104,7 +103,7 @@ namespace WebApiClient.Tools.Swagger
         /// <returns></returns>
         private string ReadTemplate()
         {
-            using (var stream = new FileStream(this.TemplateFile, FileMode.Open))
+            using (var stream = new FileStream(TemplateFile, FileMode.Open))
             {
                 using (var reader = new StreamReader(stream))
                 {
@@ -119,7 +118,7 @@ namespace WebApiClient.Tools.Swagger
         /// <returns></returns>
         TextReader ITemplateSource.GetTemplateReader()
         {
-            return new StringReader(this.Template);
+            return new StringReader(Template);
         }
 
         /// <summary>
@@ -134,7 +133,8 @@ namespace WebApiClient.Tools.Swagger
             {
                 throw new ArgumentNullException(nameof(model));
             }
-            return Razor.RunCompile(this.TemplateFile, this, model);
+
+            return Razor.RunCompile(TemplateFile, this, model);
         }
 
         /// <summary>
@@ -149,7 +149,8 @@ namespace WebApiClient.Tools.Swagger
             {
                 throw new ArgumentNullException(nameof(model));
             }
-            var html = this.RenderHtml(model);
+
+            var html = RenderHtml(model);
             var doc = XDocument.Parse(html).Root;
             var builder = new StringBuilder();
 
@@ -164,22 +165,23 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="builder"></param>
         private void RenderText(XElement element, StringBuilder builder)
         {
-            if (element.HasElements == true)
+            if (element.HasElements)
             {
                 foreach (var item in element.Elements())
                 {
                     RenderText(item, builder);
                 }
+
                 return;
             }
 
             var text = element.Value?.Trim();
-            if (string.IsNullOrEmpty(text) == true)
+            if (string.IsNullOrEmpty(text))
             {
                 return;
             }
 
-            if (this.BlockElements.Contains(element.Name.ToString()))
+            if (BlockElements.Contains(element.Name.ToString()))
             {
                 builder.AppendLine().Append(text);
                 if (element.NextNode == null)
@@ -197,7 +199,6 @@ namespace WebApiClient.Tools.Swagger
             }
         }
 
-
         /// <summary>
         /// 表示Rozor引擎
         /// </summary>
@@ -206,17 +207,17 @@ namespace WebApiClient.Tools.Swagger
             /// <summary>
             /// razor引擎
             /// </summary>
-            private static readonly IRazorEngineService razor;
+            private static readonly IRazorEngineService _razor;
 
             /// <summary>
             /// 同步锁
             /// </summary>
-            private static readonly object syncRoot = new object();
+            private static readonly object _syncRoot = new object();
 
             /// <summary>
             /// 视图名称集合
             /// </summary>
-            private static readonly HashSet<string> templateNames = new HashSet<string>();
+            private static readonly HashSet<string> _templateNames = new HashSet<string>();
 
             /// <summary>
             /// 视图模板
@@ -228,7 +229,7 @@ namespace WebApiClient.Tools.Swagger
                     Debug = true,
                     CachingProvider = new DefaultCachingProvider(t => { })
                 };
-                razor = RazorEngineService.Create(config);
+                _razor = RazorEngineService.Create(config);
             }
 
             /// <summary>
@@ -245,16 +246,16 @@ namespace WebApiClient.Tools.Swagger
                     throw new ArgumentNullException(nameof(model));
                 }
 
-                lock (syncRoot)
+                lock (_syncRoot)
                 {
-                    if (templateNames.Add(name) == true)
+                    if (_templateNames.Add(name))
                     {
-                        razor.AddTemplate(name, source);
-                        razor.Compile(name);
+                        _razor.AddTemplate(name, source);
+                        _razor.Compile(name);
                     }
                 }
 
-                return razor.RunCompile(name, model.GetType(), model);
+                return _razor.RunCompile(name, model.GetType(), model);
             }
         }
     }

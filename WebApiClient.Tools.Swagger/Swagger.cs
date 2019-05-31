@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NJsonSchema.CodeGeneration;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -16,17 +17,17 @@ namespace WebApiClient.Tools.Swagger
     /// </summary>
     public class Swagger
     {
-        private readonly CSharpTypeResolver resolver;
+        private readonly CSharpTypeResolver _resolver;
 
         /// <summary>
         /// 获取Swagger文档
         /// </summary>
-        public SwaggerDocument Document { get; private set; }
+        public SwaggerDocument Document { get; }
 
         /// <summary>
         /// 获取Swagger设置项
         /// </summary>
-        public HttpApiSettings Settings { get; private set; }
+        public HttpApiSettings Settings { get; }
 
         /// <summary>
         /// Swagger描述
@@ -37,8 +38,13 @@ namespace WebApiClient.Tools.Swagger
         {
             if (string.IsNullOrEmpty(options.Namespace) == false)
             {
-                this.Settings.AspNetNamespace = options.Namespace;
-                this.Settings.CSharpGeneratorSettings.Namespace = options.Namespace;
+                Settings.AspNetNamespace = options.Namespace;
+                Settings.CSharpGeneratorSettings.Namespace = options.Namespace;
+            }
+
+            if (string.IsNullOrWhiteSpace(options.TaskReturnType) == false)
+            {
+                Settings.TaskReturnType = options.TaskReturnType;
             }
         }
 
@@ -48,11 +54,11 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="document">Swagger文档</param>
         public Swagger(SwaggerDocument document)
         {
-            this.Document = document;
-            this.Settings = new HttpApiSettings();
+            Document = document;
+            Settings = new HttpApiSettings();
 
-            this.resolver = SwaggerToCSharpGeneratorBase
-                .CreateResolverWithExceptionSchema(this.Settings.CSharpGeneratorSettings, document);
+            _resolver = SwaggerToCSharpGeneratorBase
+                .CreateResolverWithExceptionSchema(Settings.CSharpGeneratorSettings, document);
         }
 
         /// <summary>
@@ -78,7 +84,7 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         public void GenerateFiles()
         {
-            var dir = Path.Combine("output", this.Settings.AspNetNamespace);
+            var dir = Path.Combine("output", Settings.AspNetNamespace);
             var apisPath = Path.Combine(dir, "HttpApis");
             var modelsPath = Path.Combine(dir, "HttpModels");
 
@@ -113,21 +119,21 @@ namespace WebApiClient.Tools.Swagger
             /// <summary>
             /// swagger
             /// </summary>
-            private readonly Swagger swagger;
+            private readonly Swagger _swagger;
 
             /// <summary>
             /// api列表
             /// </summary>
-            private readonly List<HttpApi> httpApiList = new List<HttpApi>();
+            private readonly List<HttpApi> _httpApiList = new List<HttpApi>();
 
             /// <summary>
             /// HttpApi提供者
             /// </summary>
             /// <param name="swagger"></param>
             public HttpApiProvider(Swagger swagger)
-                : base(swagger.Document, swagger.Settings, swagger.resolver)
+                : base(swagger.Document, swagger.Settings, swagger._resolver)
             {
-                this.swagger = swagger;
+                _swagger = swagger;
             }
 
             /// <summary>
@@ -136,36 +142,29 @@ namespace WebApiClient.Tools.Swagger
             /// <returns></returns>
             public HttpApi[] GetHttpApis()
             {
-                this.httpApiList.Clear();
-                this.GenerateFile();
-                return this.httpApiList.ToArray();
+                _httpApiList.Clear();
+                GenerateFile();
+                return _httpApiList.ToArray();
             }
 
             /// <summary>
             /// 生成客户端调用代码
             /// 但实际只为了获得HttpApi实例
             /// </summary>
-            /// <param name="controllerName"></param>
-            /// <param name="controllerClassName"></param>
-            /// <param name="operations"></param>
-            /// <param name="outputType"></param>
-            /// <returns></returns>
-            protected override string GenerateClientClass(string controllerName, string controllerClassName, IList<CSharpOperationModel> operations, ClientGeneratorOutputType outputType)
+            protected override IEnumerable<CodeArtifact> GenerateClientTypes(string controllerName,
+                string controllerClassName, IEnumerable<CSharpOperationModel> operations)
             {
-                var model = new HttpApi(controllerClassName, operations, this.swagger.Document, this.swagger.Settings);
-                this.httpApiList.Add(model);
-                return string.Empty;
+                var model = new HttpApi(controllerClassName, operations, _swagger.Document, _swagger.Settings);
+                _httpApiList.Add(model);
+                return Enumerable.Empty<CodeArtifact>();
             }
 
             /// <summary>
             /// 生成文件
             /// 这里不生成
             /// </summary>
-            /// <param name="clientCode"></param>
-            /// <param name="clientClasses"></param>
-            /// <param name="outputType"></param>
-            /// <returns></returns>
-            protected override string GenerateFile(string clientCode, IEnumerable<string> clientClasses, ClientGeneratorOutputType outputType)
+            protected override string GenerateFile(IEnumerable<CodeArtifact> clientTypes,
+                IEnumerable<CodeArtifact> dtoTypes, ClientGeneratorOutputType outputType)
             {
                 return string.Empty;
             }
@@ -177,9 +176,11 @@ namespace WebApiClient.Tools.Swagger
             /// <param name="operation"></param>
             /// <param name="settings"></param>
             /// <returns></returns>
-            protected override CSharpOperationModel CreateOperationModel(SwaggerOperation operation, ClientGeneratorBaseSettings settings)
+            protected override CSharpOperationModel CreateOperationModel(SwaggerOperation operation,
+                ClientGeneratorBaseSettings settings)
             {
-                return new HttpApiMethod(operation, (SwaggerToCSharpGeneratorSettings)settings, this, (CSharpTypeResolver)Resolver);
+                return new HttpApiMethod(operation, (SwaggerToCSharpGeneratorSettings) settings, this,
+                    (CSharpTypeResolver) Resolver, _swagger.Settings.TaskReturnType);
             }
         }
 
@@ -191,16 +192,16 @@ namespace WebApiClient.Tools.Swagger
             /// <summary>
             /// swagger
             /// </summary>
-            private readonly Swagger swagger;
+            private readonly Swagger _swagger;
 
             /// <summary>
             /// HttpModel提供者
             /// </summary>
             /// <param name="swagger"></param>
             public HttpModelProvider(Swagger swagger)
-                : base(swagger.Document, swagger.Settings.CSharpGeneratorSettings, swagger.resolver)
+                : base(swagger.Document, swagger.Settings.CSharpGeneratorSettings, swagger._resolver)
             {
-                this.swagger = swagger;
+                _swagger = swagger;
             }
 
             /// <summary>
@@ -209,9 +210,8 @@ namespace WebApiClient.Tools.Swagger
             /// <returns></returns>
             public HttpModel[] GetHttpModels()
             {
-                return this.GenerateTypes()
-                    .Artifacts
-                    .Select(item => new HttpModel(item, this.swagger.Settings.AspNetNamespace))
+                return GenerateTypes()
+                    .Select(item => new HttpModel(item, _swagger.Settings.AspNetNamespace))
                     .ToArray();
             }
         }

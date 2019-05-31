@@ -17,22 +17,33 @@ namespace WebApiClient.Tools.Swagger
     public class HttpApiSettings : SwaggerToCSharpControllerGeneratorSettings
     {
         /// <summary>
+        /// 命名空间
+        /// </summary>
+        public string AspNetNamespace { get; set; }
+
+        /// <summary>
+        /// Task返回值类型，默认为:ITask
+        /// </summary>
+        public string TaskReturnType { get; set; }
+        
+        /// <summary>
         /// WebApiClient接口设置模型
         /// </summary>
         public HttpApiSettings()
         {
-            this.ResponseArrayType = "List";
-            this.ResponseDictionaryType = "Dictionary";
-            this.ParameterArrayType = "IEnumerable";
-            this.ParameterDictionaryType = "IDictionary";
+            ResponseArrayType = "List";
+            ResponseDictionaryType = "Dictionary";
+            ParameterArrayType = "IEnumerable";
+            ParameterDictionaryType = "IDictionary";
+            TaskReturnType = "ITask";
 
-            this.AspNetNamespace = this.GetType().Namespace;
-            this.OperationNameGenerator = new OperationNameProvider();
-            this.ParameterNameGenerator = new ParameterNameProvider();
-            this.CSharpGeneratorSettings.TypeNameGenerator = new TypeNameProvider();
-            this.CSharpGeneratorSettings.ClassStyle = CSharpClassStyle.Poco;
-            this.CSharpGeneratorSettings.GenerateJsonMethods = false;
-            this.RouteNamingStrategy = CSharpControllerRouteNamingStrategy.OperationId;
+            AspNetNamespace = GetType().Namespace;
+            OperationNameGenerator = new OperationNameProvider();
+            ParameterNameGenerator = new ParameterNameProvider();
+            CSharpGeneratorSettings.TypeNameGenerator = new TypeNameProvider();
+            CSharpGeneratorSettings.ClassStyle = CSharpClassStyle.Poco;
+            CSharpGeneratorSettings.GenerateJsonMethods = false;
+            RouteNamingStrategy = CSharpControllerRouteNamingStrategy.OperationId;
         }
 
         /// <summary>
@@ -48,7 +59,7 @@ namespace WebApiClient.Tools.Swagger
             /// <param name="httpMethod"></param>
             /// <param name="operation"></param>
             /// <returns></returns>
-            public override string GetClientName(SwaggerDocument document, string path, SwaggerOperationMethod httpMethod, SwaggerOperation operation)
+            public override string GetClientName(SwaggerDocument document, string path, string httpMethod, SwaggerOperation operation)
             {
                 return operation.Tags.FirstOrDefault();
             }
@@ -141,18 +152,18 @@ namespace WebApiClient.Tools.Swagger
             /// <returns></returns>
             private static string PrettyName(string name)
             {
-                if (string.IsNullOrEmpty(name) == true)
+                if (string.IsNullOrEmpty(name))
                 {
                     return name;
                 }
 
-                if (name.Contains("[]") == true)
+                if (name.Contains("[]"))
                 {
                     name = name.Replace("[]", "Array");
                 }
 
-                var matchs = Regex.Matches(name, @"\W");
-                if (matchs.Count == 0 || matchs.Count % 2 > 0)
+                var matches = Regex.Matches(name, @"\W");
+                if (matches.Count == 0 || matches.Count % 2 > 0)
                 {
                     return name;
                 }
@@ -161,7 +172,7 @@ namespace WebApiClient.Tools.Swagger
                 return Regex.Replace(name, @"\W", m =>
                 {
                     index = index + 1;
-                    return index < matchs.Count / 2 ? "Of" : null;
+                    return index < matches.Count / 2 ? "Of" : null;
                 });
             }
         }

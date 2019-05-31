@@ -31,18 +31,14 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="typeName">类型名称</param>
         /// <param name="type">类型分类</param>
         public CSharpCode(string source, string typeName, CodeArtifactType type)
-            : base(typeName, type, CodeArtifactLanguage.CSharp)
+            : base(typeName, type, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, Pretty(source))
         {
-            this.Code = Pretty(source);
         }
 
         /// <summary>
         /// 获取所有行
         /// </summary>
-        public IEnumerable<string> Lines
-        {
-            get => GetLines(this.Code);
-        }
+        public IEnumerable<string> Lines => GetLines(Code);
 
         /// <summary>
         /// 转换为字符串代码
@@ -50,7 +46,7 @@ namespace WebApiClient.Tools.Swagger
         /// <returns></returns>
         public override string ToString()
         {
-            return this.Code;
+            return Code;
         }
 
         /// <summary>
@@ -123,12 +119,11 @@ namespace WebApiClient.Tools.Swagger
                 var isEndProperty = line.EndsWith("{ get; set; }");
 
                 var prefix = string.Empty.PadRight(cTab * 4, ' ');
-                var suffix = isEndMethod || isEndEnum || isEndProperty ?
-                    Environment.NewLine :
-                    null;
+                var suffix = isEndMethod || isEndEnum || isEndProperty ? Environment.NewLine : null;
 
                 builder.AppendLine($"{prefix}{line}{suffix}");
             }
+
             return builder.ToString().Trim();
         }
 

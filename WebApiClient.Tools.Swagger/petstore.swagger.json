@@ -1,7 +1,6 @@
 {
   "swagger": "2.0",
   "info": {
-    "tags": null,
     "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
     "version": "1.0.0",
     "title": "Swagger Petstore",
@@ -62,7 +61,7 @@
         "parameters": [
           {
             "in": "body",
-            "name": "BODY",
+            "name": "body",
             "description": "Pet object that needs to be added to the store",
             "required": true,
             "schema": {
@@ -192,7 +191,7 @@
           "pet"
         ],
         "summary": "Finds Pets by tags",
-        "description": "Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+        "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
         "operationId": "findPetsByTags",
         "produces": [
           "application/xml",
@@ -846,7 +845,7 @@
   "securityDefinitions": {
     "petstore_auth": {
       "type": "oauth2",
-      "authorizationUrl": "https://petstore.swagger.io/oauth/dialog",
+      "authorizationUrl": "https://petstore.swagger.io/oauth/authorize",
       "flow": "implicit",
       "scopes": {
         "write:pets": "modify pets in your account",
@@ -962,21 +961,6 @@
         "name": "Tag"
       }
     },
-    "ApiResponse": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "type": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        }
-      }
-    },
     "Pet": {
       "type": "object",
       "required": [
@@ -1027,6 +1011,21 @@
       },
       "xml": {
         "name": "Pet"
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
       }
     }
   },
