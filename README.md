@@ -8,6 +8,7 @@
 ```
   -s Swagger, --swagger=Swagger          Required. swagger的json本地文件路径或远程Uri地址
   -n Namespace, --namespace=Namespace    代码的命名空间，如WebApiClient.Swagger
+  -t TaskReturnType, --task=Task    Task返回值类型，如ITask、Task
   --help                                 Display this help screen.
 ```
 ### 1.2 工作流程
