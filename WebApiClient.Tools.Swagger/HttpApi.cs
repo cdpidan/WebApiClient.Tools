@@ -38,7 +38,7 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="operations">swagger操作</param>
         /// <param name="document">swagger文档</param>
         /// <param name="settings">设置项</param>
-        public HttpApi(string className, IEnumerable<CSharpOperationModel> operations, SwaggerDocument document,
+        public HttpApi(string className, IEnumerable<CSharpOperationModel> operations, OpenApiDocument document,
             HttpApiSettings settings) : base(className, operations, document, settings)
         {
             var tag = document.Tags

@@ -22,7 +22,7 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 获取Swagger文档
         /// </summary>
-        public SwaggerDocument Document { get; }
+        public OpenApiDocument Document { get; }
 
         /// <summary>
         /// 获取Swagger设置项
@@ -33,8 +33,7 @@ namespace WebApiClient.Tools.Swagger
         /// Swagger描述
         /// </summary>
         /// <param name="options">选项</param>
-        public Swagger(SwaggerOptions options)
-            : this(GetDocument(options.Swagger))
+        public Swagger(SwaggerOptions options) : this(GetDocument(options.Swagger))
         {
             if (string.IsNullOrEmpty(options.Namespace) == false)
             {
@@ -52,12 +51,12 @@ namespace WebApiClient.Tools.Swagger
         /// Swagger描述
         /// </summary>
         /// <param name="document">Swagger文档</param>
-        public Swagger(SwaggerDocument document)
+        public Swagger(OpenApiDocument document)
         {
             Document = document;
             Settings = new HttpApiSettings();
 
-            _resolver = SwaggerToCSharpGeneratorBase
+            _resolver = CSharpGeneratorBase
                 .CreateResolverWithExceptionSchema(Settings.CSharpGeneratorSettings, document);
         }
 
@@ -66,17 +65,15 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         /// <param name="swagger"></param>
         /// <returns></returns>
-        private static SwaggerDocument GetDocument(string swagger)
+        private static OpenApiDocument GetDocument(string swagger)
         {
             Console.WriteLine($"正在分析swagger：{swagger}");
-            if (Uri.TryCreate(swagger, UriKind.Absolute, out var _) == true)
+            if (Uri.TryCreate(swagger, UriKind.Absolute, out _))
             {
-                return SwaggerDocument.FromUrlAsync(swagger).Result;
+                return OpenApiDocument.FromUrlAsync(swagger).Result;
             }
-            else
-            {
-                return SwaggerDocument.FromFileAsync(swagger).Result;
-            }
+
+            return OpenApiDocument.FromFileAsync(swagger).Result;
         }
 
         /// <summary>
@@ -114,7 +111,7 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 表示HttpApi提供者
         /// </summary>
-        private class HttpApiProvider : SwaggerToCSharpControllerGenerator
+        private class HttpApiProvider : CSharpControllerGenerator
         {
             /// <summary>
             /// swagger
@@ -176,10 +173,10 @@ namespace WebApiClient.Tools.Swagger
             /// <param name="operation"></param>
             /// <param name="settings"></param>
             /// <returns></returns>
-            protected override CSharpOperationModel CreateOperationModel(SwaggerOperation operation,
+            protected override CSharpOperationModel CreateOperationModel(OpenApiOperation operation,
                 ClientGeneratorBaseSettings settings)
             {
-                return new HttpApiMethod(operation, (SwaggerToCSharpGeneratorSettings) settings, this,
+                return new HttpApiMethod(operation, (CSharpGeneratorBaseSettings) settings, this,
                     (CSharpTypeResolver) Resolver, _swagger.Settings.TaskReturnType);
             }
         }

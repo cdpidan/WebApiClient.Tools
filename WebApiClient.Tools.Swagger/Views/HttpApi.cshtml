@@ -93,23 +93,23 @@
                                 <span>[Required]</span>
                             }
 
-                            if (parameter.VariableName != parameter.Name&& parameter.Kind != SwaggerParameterKind.Header)
+                            if (parameter.VariableName != parameter.Name&& parameter.Kind != OpenApiParameterKind.Header)
                             {
                                 <span>[AliasAs("@(parameter.Name)")]</span>
                             }
 
-                            if (parameter.Kind == SwaggerParameterKind.Path || parameter.Kind == SwaggerParameterKind.Query)
+                            if (parameter.Kind == OpenApiParameterKind.Path || parameter.Kind == OpenApiParameterKind.Query)
                             {
-                                var schema = parameter.Schema as NSwag.SwaggerParameter;
-                                if (schema.CollectionFormat != SwaggerParameterCollectionFormat.Undefined)
+                                var schema = parameter.Schema as NSwag.OpenApiParameter;
+                                if (schema.CollectionFormat != OpenApiParameterCollectionFormat.Undefined)
                                 {
-                                    if (schema.CollectionFormat != SwaggerParameterCollectionFormat.Multi)
+                                    if (schema.CollectionFormat != OpenApiParameterCollectionFormat.Multi)
                                     {
                                         <span>[PathQuery(CollectionFormat = CollectionFormat.@(schema.CollectionFormat))]</span>
                                     }
                                 }
                             }
-                            else if (parameter.Kind == SwaggerParameterKind.Header)
+                            else if (parameter.Kind == OpenApiParameterKind.Header)
                             {
                                 <span>[Header("@(parameter.Name)")]</span>
                             }
@@ -117,11 +117,11 @@
                             {
                                 <span>[XmlContent]</span>
                             }
-                            else if (parameter.Kind == SwaggerParameterKind.Body)
+                            else if (parameter.Kind == OpenApiParameterKind.Body)
                             {
                                 <span>[JsonContent]</span>
                             }
-                            else if (parameter.Kind == SwaggerParameterKind.FormData)
+                            else if (parameter.Kind == OpenApiParameterKind.FormData)
                             {
                                 if (parameter.IsFile == false)
                                 {

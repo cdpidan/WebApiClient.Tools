@@ -13,7 +13,7 @@ namespace WebApiClient.Tools.Swagger
     public class HttpApiMethod : CSharpOperationModel
     {
         private readonly string _settingsTaskReturnType;
-        
+
         /// <summary>
         /// WebApiClient的请求方法数据模型
         /// </summary>
@@ -22,8 +22,8 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="generator">代码生成器</param>
         /// <param name="resolver">语法解析器</param>
         /// <param name="settingsTaskReturnType"></param>
-        public HttpApiMethod(SwaggerOperation operation, SwaggerToCSharpGeneratorSettings settings,
-            SwaggerToCSharpGeneratorBase generator, CSharpTypeResolver resolver, string settingsTaskReturnType)
+        public HttpApiMethod(OpenApiOperation operation, CSharpGeneratorBaseSettings settings,
+            CSharpGeneratorBase generator, CSharpTypeResolver resolver, string settingsTaskReturnType)
             : base(operation, settings, generator, resolver)
         {
             _settingsTaskReturnType = settingsTaskReturnType;
@@ -69,15 +69,17 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         /// <param name="parameter">参数</param>
         /// <returns></returns>
-        protected override string ResolveParameterType(SwaggerParameter parameter)
+        protected override string ResolveParameterType(OpenApiParameter parameter)
         {
             var schema = parameter.ActualSchema;
             if (schema.Type == JsonObjectType.File)
             {
-                if (parameter.CollectionFormat == SwaggerParameterCollectionFormat.Multi && !schema.Type.HasFlag(JsonObjectType.Array))
+                if (parameter.CollectionFormat == OpenApiParameterCollectionFormat.Multi &&
+                    !schema.Type.HasFlag(JsonObjectType.Array))
                 {
                     return "IEnumerable<MulitpartFile>";
                 }
+
                 return "MulitpartFile";
             }
 
