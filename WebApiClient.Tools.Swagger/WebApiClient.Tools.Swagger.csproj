@@ -5,7 +5,7 @@
     <TargetFramework>net451</TargetFramework>
     <Authors>xljiulang</Authors>
     <Company>xljiulang</Company>
-    <Copyright>Copyright © xljiulang 2018</Copyright>
+    <Copyright>Copyright © xljiulang 2019</Copyright>
     <Description>将swagger的本地或远程json文件解析生成WebApiClient的接口定义代码文件的工具</Description>
     <Summary>将swagger的本地或远程json文件解析生成WebApiClient的接口定义代码文件的工具</Summary>
   </PropertyGroup>
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="1.9.71" />
+    <PackageReference Include="CommandLineParser" Version="2.5.0" />
     <PackageReference Include="RazorEngine" Version="3.10.0" />
     <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.0.2" />
   </ItemGroup>

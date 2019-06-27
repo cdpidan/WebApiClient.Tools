@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using CommandLine.Text;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -17,7 +16,8 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 代码的命名空间
         /// </summary>
-        [Option('n', "namespace", MetaValue = "Namespace", Required = false, HelpText = "代码的命名空间，如WebApiClient.Swagger")]
+        [Option('n', "namespace", MetaValue = "Namespace", Required = false,
+            HelpText = "代码的命名空间，如WebApiClient.Swagger")]
         public string Namespace { get; set; }
 
         /// <summary>
@@ -25,15 +25,5 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         [Option('t', "task", MetaValue = "TaskReturnType", Required = false, HelpText = "Task返回值类型，如: ITask、Task")]
         public string TaskReturnType { get; set; }
-
-        /// <summary>
-        /// 返回使用帮助
-        /// </summary>
-        /// <returns></returns>
-        [HelpOption]
-        public string GetUsage()
-        {
-            return HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
-        }
     }
 }

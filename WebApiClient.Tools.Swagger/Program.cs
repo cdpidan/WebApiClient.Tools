@@ -1,6 +1,4 @@
 ﻿using CommandLine;
-using NSwag;
-using System;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -8,17 +6,13 @@ namespace WebApiClient.Tools.Swagger
     {
         static void Main(string[] args)
         {
-            var options = new SwaggerOptions();
-            if (Parser.Default.ParseArguments(args, options))
-            {
-                var swagger = new Swagger(options);
-                swagger.GenerateFiles();
-            }
-            else
-            {
-                Console.WriteLine(options.GetUsage());
-                Console.Read();
-            }
+            Parser.Default
+                .ParseArguments<SwaggerOptions>(args)
+                .WithParsed(options =>
+                {
+                    var swagger = new Swagger(options);
+                    swagger.GenerateFiles();
+                });
         }
     }
 }

@@ -29,7 +29,7 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         public bool HasSummary => string.IsNullOrEmpty(Summary) == false;
 
-        public new  string AspNetNamespace { get; }
+        public new string AspNetNamespace { get; }
 
         /// <summary>
         /// WebApiClient的接口数据模型
