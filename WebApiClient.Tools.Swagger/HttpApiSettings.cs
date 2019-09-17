@@ -17,11 +17,11 @@ namespace WebApiClient.Tools.Swagger
     public class HttpApiSettings : CSharpControllerGeneratorSettings
     {
         /// <summary>
-        /// 命名空间
+        /// 获取或设置命名空间
         /// </summary>
-        public string AspNetNamespace { get; set; }
+        public string NameSpace { get; set; } = "WebApiClient";
 
-        /// <summary>
+        /// <summary> 
         /// Task返回值类型，默认为:ITask
         /// </summary>
         public string TaskReturnType { get; set; }
@@ -37,7 +37,6 @@ namespace WebApiClient.Tools.Swagger
             ParameterDictionaryType = "IDictionary";
             TaskReturnType = "ITask";
 
-            AspNetNamespace = GetType().Namespace;
             OperationNameGenerator = new OperationNameProvider();
             ParameterNameGenerator = new ParameterNameProvider();
             CSharpGeneratorSettings.TypeNameGenerator = new TypeNameProvider();

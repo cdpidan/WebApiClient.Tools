@@ -4,22 +4,22 @@
 @using RazorEngine.Templating
 
 <HttpModel>
-  <usings>
-    <div>using System;</div>
-    <div>using System.Collections.Generic;</div>
-    <div>using System.ComponentModel.DataAnnotations;</div>
-    <div>using WebApiClient.DataAnnotations;</div>
-  </usings>
+    <usings>
+        <div>using System;</div>
+        <div>using System.Collections.Generic;</div>
+        <div>using System.ComponentModel.DataAnnotations;</div>
+        <div>using WebApiClient.DataAnnotations;</div>
+    </usings>
 
-  <namespace>
-    <div>namespace @(Model.AspNetNamespace)</div>
-    <div>{</div>
-    <class>
-      @foreach (var line in Model.Lines)
-      {
-        <div>@line</div>
-      }
-    </class>
-    <div>}</div>
-  </namespace>
+    <namespace>
+        <div>namespace @(Model.NameSpace)</div>
+        <div>{</div>
+        <class>
+            @foreach (var line in Model.Lines)
+            {
+                <div>@line</div>
+            }
+        </class>
+        <div>}</div>
+    </namespace>
 </HttpModel>
