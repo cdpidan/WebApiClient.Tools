@@ -14,6 +14,8 @@ namespace WebApiClient.Tools.Swagger
     [DebuggerDisplay("TypeName = {TypeName}")]
     public class HttpApi : CSharpControllerTemplateModel
     {
+        public string NameSpace { get; } = "WebApiClient";
+
         /// <summary>
         /// 获取接口名称
         /// </summary>
@@ -29,8 +31,6 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         public bool HasSummary => string.IsNullOrEmpty(Summary) == false;
 
-        public new string AspNetNamespace { get; }
-
         /// <summary>
         /// WebApiClient的接口数据模型
         /// </summary>
@@ -39,14 +39,15 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="document">swagger文档</param>
         /// <param name="settings">设置项</param>
         public HttpApi(string className, IEnumerable<CSharpOperationModel> operations, OpenApiDocument document,
-            HttpApiSettings settings) : base(className, operations, document, settings)
+            HttpApiSettings settings)
+            : base(className, operations, document, settings)
         {
             var tag = document.Tags
                 .FirstOrDefault(item => string.Equals(item.Name, className, StringComparison.OrdinalIgnoreCase));
 
             TypeName = $"I{Class}Api";
             Summary = tag?.Description;
-            AspNetNamespace = settings.AspNetNamespace;
+            NameSpace = settings.NameSpace;
         }
 
         /// <summary>

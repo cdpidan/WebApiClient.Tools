@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net451</TargetFramework>
     <Authors>xljiulang</Authors>
     <Company>xljiulang</Company>
-    <Copyright>Copyright © xljiulang 2019</Copyright>
+    <Copyright>Copyright © xljiulang 2018</Copyright>
     <Description>将swagger的本地或远程json文件解析生成WebApiClient的接口定义代码文件的工具</Description>
     <Summary>将swagger的本地或远程json文件解析生成WebApiClient的接口定义代码文件的工具</Summary>
-    <TargetFrameworks>net451;netcoreapp2.2</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.6.0" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.0.4" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.0.6" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">

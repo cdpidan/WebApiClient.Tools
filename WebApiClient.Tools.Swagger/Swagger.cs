@@ -1,4 +1,5 @@
-﻿using NJsonSchema.CodeGeneration.CSharp;
+﻿using NJsonSchema.CodeGeneration;
+using NJsonSchema.CodeGeneration.CSharp;
 using NSwag;
 using NSwag.CodeGeneration;
 using NSwag.CodeGeneration.CSharp;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using NJsonSchema.CodeGeneration;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -37,7 +37,7 @@ namespace WebApiClient.Tools.Swagger
         {
             if (string.IsNullOrEmpty(options.Namespace) == false)
             {
-                Settings.AspNetNamespace = options.Namespace;
+                Settings.NameSpace = options.Namespace;
                 Settings.CSharpGeneratorSettings.Namespace = options.Namespace;
             }
 
@@ -81,7 +81,7 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         public void GenerateFiles()
         {
-            var dir = Path.Combine("output", Settings.AspNetNamespace);
+            var dir = Path.Combine("output", Settings.NameSpace);
             var apisPath = Path.Combine(dir, "HttpApis");
             var modelsPath = Path.Combine(dir, "HttpModels");
 
@@ -208,7 +208,7 @@ namespace WebApiClient.Tools.Swagger
             public HttpModel[] GetHttpModels()
             {
                 return GenerateTypes()
-                    .Select(item => new HttpModel(item, _swagger.Settings.AspNetNamespace))
+                    .Select(item => new HttpModel(item, _swagger.Settings.NameSpace))
                     .ToArray();
             }
         }

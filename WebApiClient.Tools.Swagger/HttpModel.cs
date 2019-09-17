@@ -10,16 +10,17 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 获取使用的命名空间
         /// </summary>
-        public string AspNetNamespace { get; }
+        public string NameSpace { get; }
 
         /// <summary>
         /// WebApiClient的模型描述
         /// </summary>
         /// <param name="codeArtifact">源代码</param>
         /// <param name="nameSpace">命名空间</param>
-        public HttpModel(CodeArtifact codeArtifact, string nameSpace) : base(codeArtifact)
+        public HttpModel(CodeArtifact codeArtifact, string nameSpace)
+            : base(codeArtifact)
         {
-            AspNetNamespace = nameSpace;
+            NameSpace = nameSpace;
         }
 
         /// <summary>
