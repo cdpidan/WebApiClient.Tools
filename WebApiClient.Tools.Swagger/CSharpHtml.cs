@@ -38,7 +38,7 @@ namespace WebApiClient.Tools.Swagger
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var path = $"Views\\{name}";
+            var path = $"Views{Path.DirectorySeparatorChar}{name}";
             return new CSharpHtml<T>(path);
         }
     }
