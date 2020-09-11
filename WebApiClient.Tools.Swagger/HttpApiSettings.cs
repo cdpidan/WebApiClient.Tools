@@ -166,12 +166,19 @@ namespace WebApiClient.Tools.Swagger
                     name = name.Replace("[]", "Array");
                 }
 
+                // 处理字典
+                if (Regex.IsMatch(name, "Map«(.*?),(.*?)»"))
+                {
+                    name = Regex.Replace(name, "Map«(.*?),(.*?)»", "Dictionary<$1, $2>");
+                }
+
                 var matches = Regex.Matches(name, @"\W");
                 if (matches.Count == 0 || matches.Count % 2 > 0)
                 {
                     return name;
                 }
 
+                //泛型
                 var index = -1;
                 return Regex.Replace(name, @"\W", m =>
                 {
