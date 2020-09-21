@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net451</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>xljiulang</Authors>
     <Company>xljiulang</Company>
     <Copyright>Copyright © xljiulang 2018</Copyright>
     <Description>将swagger的本地或远程json文件解析生成WebApiClient的接口定义代码文件的工具</Description>
     <Summary>将swagger的本地或远程json文件解析生成WebApiClient的接口定义代码文件的工具</Summary>
+    <SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,15 +19,8 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.7.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
-    <PackageReference Include="RazorEngine" Version="3.10.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <PackageReference Include="RazorEngine.NetCore.ZuLiang" Version="2.2.3.6" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.7.4" />
+    <PackageReference Include="RazorEngineCore" Version="2020.6.1" />
   </ItemGroup>
 
   <ItemGroup>

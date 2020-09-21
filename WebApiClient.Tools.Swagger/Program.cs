@@ -7,10 +7,10 @@ namespace WebApiClient.Tools.Swagger
         static void Main(string[] args)
         {
             Parser.Default
-                .ParseArguments<SwaggerOptions>(args)
+                .ParseArguments<OpenApiDocOptions>(args)
                 .WithParsed(options =>
                 {
-                    var swagger = new Swagger(options);
+                    var swagger = new OpenApiDoc(options);
                     swagger.GenerateFiles();
                 });
         }

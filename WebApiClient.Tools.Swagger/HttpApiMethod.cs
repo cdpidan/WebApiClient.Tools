@@ -33,10 +33,20 @@ namespace WebApiClient.Tools.Swagger
         /// 获取方法的返回类型
         /// 默认使用ITask
         /// </summary>
-        public override string ResultType =>
-            SyncResultType == "void"
-                ? $"{_settingsTaskReturnType}<HttpResponseMessage>"
-                : $"{_settingsTaskReturnType}<{SyncResultType}>";
+        public override string ResultType
+        {
+            get
+            {
+                switch (SyncResultType)
+                {
+                    case "void":
+                    case "FileResult":
+                        return $"{_settingsTaskReturnType}<HttpResponseMessage>";
+                    default:
+                        return $"{_settingsTaskReturnType}<{SyncResultType}>";
+                }
+            }
+        }
 
         /// <summary>
         /// 获取方法好友名称

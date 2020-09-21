@@ -15,7 +15,7 @@ namespace WebApiClient.Tools.Swagger
     /// <summary>
     /// 表示Swagger描述
     /// </summary>
-    public class Swagger
+    public class OpenApiDoc
     {
         private readonly CSharpTypeResolver _resolver;
 
@@ -33,7 +33,7 @@ namespace WebApiClient.Tools.Swagger
         /// Swagger描述
         /// </summary>
         /// <param name="options">选项</param>
-        public Swagger(SwaggerOptions options) : this(GetDocument(options.Swagger))
+        public OpenApiDoc(OpenApiDocOptions options) : this(GetDocument(options.OpenApi))
         {
             if (string.IsNullOrEmpty(options.Namespace) == false)
             {
@@ -51,7 +51,7 @@ namespace WebApiClient.Tools.Swagger
         /// Swagger描述
         /// </summary>
         /// <param name="document">Swagger文档</param>
-        public Swagger(OpenApiDocument document)
+        public OpenApiDoc(OpenApiDocument document)
         {
             Document = document;
             Settings = new HttpApiSettings();
@@ -67,7 +67,7 @@ namespace WebApiClient.Tools.Swagger
         /// <returns></returns>
         private static OpenApiDocument GetDocument(string swagger)
         {
-            Console.WriteLine($"正在分析swagger：{swagger}");
+            Console.WriteLine($"正在分析OpenApi：{swagger}");
             if (Uri.TryCreate(swagger, UriKind.Absolute, out _))
             {
                 return OpenApiDocument.FromUrlAsync(swagger).Result;
@@ -116,7 +116,7 @@ namespace WebApiClient.Tools.Swagger
             /// <summary>
             /// swagger
             /// </summary>
-            private readonly Swagger _swagger;
+            private readonly OpenApiDoc _openApiDoc;
 
             /// <summary>
             /// api列表
@@ -126,11 +126,11 @@ namespace WebApiClient.Tools.Swagger
             /// <summary>
             /// HttpApi提供者
             /// </summary>
-            /// <param name="swagger"></param>
-            public HttpApiProvider(Swagger swagger)
-                : base(swagger.Document, swagger.Settings, swagger._resolver)
+            /// <param name="openApiDoc"></param>
+            public HttpApiProvider(OpenApiDoc openApiDoc)
+                : base(openApiDoc.Document, openApiDoc.Settings, openApiDoc._resolver)
             {
-                _swagger = swagger;
+                _openApiDoc = openApiDoc;
             }
 
             /// <summary>
@@ -151,9 +151,9 @@ namespace WebApiClient.Tools.Swagger
             protected override IEnumerable<CodeArtifact> GenerateClientTypes(string controllerName,
                 string controllerClassName, IEnumerable<CSharpOperationModel> operations)
             {
-                var model = new HttpApi(controllerClassName, operations, _swagger.Document, _swagger.Settings);
+                var model = new HttpApi(controllerClassName, operations, _openApiDoc.Document, _openApiDoc.Settings);
                 _httpApiList.Add(model);
-                return Enumerable.Empty<CodeArtifact>();
+                return new CodeArtifact[0];
             }
 
             /// <summary>
@@ -177,7 +177,7 @@ namespace WebApiClient.Tools.Swagger
                 ClientGeneratorBaseSettings settings)
             {
                 return new HttpApiMethod(operation, (CSharpGeneratorBaseSettings) settings, this,
-                    (CSharpTypeResolver) Resolver, _swagger.Settings.TaskReturnType);
+                    (CSharpTypeResolver) Resolver, _openApiDoc.Settings.TaskReturnType);
             }
         }
 
@@ -189,16 +189,16 @@ namespace WebApiClient.Tools.Swagger
             /// <summary>
             /// swagger
             /// </summary>
-            private readonly Swagger _swagger;
+            private readonly OpenApiDoc _openApiDoc;
 
             /// <summary>
             /// HttpModel提供者
             /// </summary>
-            /// <param name="swagger"></param>
-            public HttpModelProvider(Swagger swagger)
-                : base(swagger.Document, swagger.Settings.CSharpGeneratorSettings, swagger._resolver)
+            /// <param name="openApiDoc"></param>
+            public HttpModelProvider(OpenApiDoc openApiDoc)
+                : base(openApiDoc.Document, openApiDoc.Settings.CSharpGeneratorSettings, openApiDoc._resolver)
             {
-                _swagger = swagger;
+                _openApiDoc = openApiDoc;
             }
 
             /// <summary>
@@ -208,7 +208,7 @@ namespace WebApiClient.Tools.Swagger
             public HttpModel[] GetHttpModels()
             {
                 return GenerateTypes()
-                    .Select(item => new HttpModel(item, _swagger.Settings.NameSpace))
+                    .Select(item => new HttpModel(item, _openApiDoc.Settings.NameSpace))
                     .ToArray();
             }
         }

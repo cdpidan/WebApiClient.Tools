@@ -5,13 +5,13 @@ namespace WebApiClient.Tools.Swagger
     /// <summary>
     /// 表示命令选项
     /// </summary>
-    public class SwaggerOptions
+    public class OpenApiDocOptions
     {
         /// <summary>
-        /// swagger的json本地文件路径或远程Uri地址
+        /// openApi的json本地文件路径或远程Uri地址
         /// </summary>
-        [Option('s', "swagger", MetaValue = "Swagger", Required = true, HelpText = "swagger的json本地文件路径或远程Uri地址")]
-        public string Swagger { get; set; }
+        [Option('o', "openapi", MetaValue = "OpenApi", Required = true, HelpText = "OpenApi的本地文件路径或远程Uri地址")]
+        public string OpenApi { get; set; }
 
         /// <summary>
         /// 代码的命名空间
