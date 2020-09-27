@@ -169,7 +169,7 @@ namespace WebApiClient.Tools.Swagger
                 // 处理字典
                 if (Regex.IsMatch(name, "Map«(.*?),(.*?)»"))
                 {
-                    name = Regex.Replace(name, "Map«(.*?),(.*?)»", "Dictionary<$1, $2>");
+                    name = Regex.Replace(name, "Map«(.*?),(.*?)»", "Map<$1, $2>");
                 }
 
                 var matches = Regex.Matches(name, @"\W");

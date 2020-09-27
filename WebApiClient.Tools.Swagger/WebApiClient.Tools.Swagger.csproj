@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net451</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>xljiulang</Authors>
     <Company>xljiulang</Company>
     <Copyright>Copyright © xljiulang 2018</Copyright>
