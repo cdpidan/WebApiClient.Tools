@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <Authors>xljiulang</Authors>
     <Company>xljiulang</Company>
     <Copyright>Copyright © xljiulang 2018</Copyright>
@@ -19,8 +19,8 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.7.4" />
-    <PackageReference Include="RazorEngineCore" Version="2020.6.1" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.10.0" />
+    <PackageReference Include="RazorEngineCore" Version="2020.10.1" />
   </ItemGroup>
 
   <ItemGroup>
