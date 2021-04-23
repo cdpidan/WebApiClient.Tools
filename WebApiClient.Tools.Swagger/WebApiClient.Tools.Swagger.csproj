@@ -13,7 +13,8 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.10.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.10.9" />
     <PackageReference Include="RazorEngineCore" Version="2021.3.1" />
   </ItemGroup>
 
@@ -21,6 +22,9 @@
     <Compile Remove="output\**" />
     <EmbeddedResource Remove="output\**" />
     <None Remove="output\**" />
+    <None Update="petstore.swagger.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
