@@ -1,4 +1,5 @@
-﻿using RazorEngineCore;
+﻿using System.Threading.Tasks;
+using RazorEngineCore;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -11,7 +12,7 @@ namespace WebApiClient.Tools.Swagger
         /// html标签转换
         /// </summary>
         /// <param name="obj"></param>
-        public override void Write(object obj = null)
+        public override async Task WriteAsync(object obj = null)
         {
             var text = obj?.ToString();
             if (!string.IsNullOrWhiteSpace(text))
@@ -19,7 +20,7 @@ namespace WebApiClient.Tools.Swagger
                 text = text.Replace("<", "&lt;").Replace(">", "&gt;");
             }
 
-            base.Write(text);
+            await base.WriteAsync(text);
         }
     }
 
