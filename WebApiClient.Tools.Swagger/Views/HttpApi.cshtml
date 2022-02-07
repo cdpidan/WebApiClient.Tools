@@ -14,10 +14,9 @@
         <div>using System.Threading;</div>
         <div>using System.Threading.Tasks;</div>
 
-        <div>using WebApiClient;</div>
-        <div>using WebApiClient.Attributes;</div>
-        <div>using WebApiClient.DataAnnotations;</div>
-        <div>using WebApiClient.Parameterables;</div>       
+        <div>using WebApiClientCore;</div>
+        <div>using WebApiClientCore.Attributes;</div>
+        <div>using WebApiClientCore.Parameters;</div>
     </usings>
 
     <namespace>
@@ -36,7 +35,7 @@
                 }
             </summary>
             <attributes>
-                <div>[TraceFilter]</div>
+                <div>[LoggingFilter]</div>
                 @if (string.IsNullOrEmpty(Model.BaseUrl) == false)
                 {
                     <div>[HttpHost("@(Model.BaseUrl.TrimEnd('/'))/")]</div>
@@ -56,15 +55,13 @@
                             <div>/// @line</div>
                         }
                         <div>/// &lt;/summary&gt;</div>
-                    }
 
-                    @foreach (var parameter in method.Parameters)
-                    {
-                        var description = parameter.HasDescription ? parameter.Description.Replace("\r", "\t").Replace("\n", "\t") : null;
-                        <div>/// &lt;param name="@(parameter.VariableName)"&gt;@(description)&lt;/param&gt;</div>
-                    }
-                    @if (method.HasResultDescription == true)
-                    {
+                        foreach (var parameter in method.Parameters)
+                        {
+                            var description = parameter.HasDescription ? parameter.Description.Replace("\r", "\t").Replace("\n", "\t") : null;
+                            <div>/// &lt;param name="@(parameter.VariableName)"&gt;@(description)&lt;/param&gt;</div>
+                        }
+                        <div>/// &lt;param name="cancellationToken"&gt;cancellationToken&lt;/param&gt;</div>
                         <div>/// &lt;returns&gt;@(method.ResultDescription)&lt;/returns&gt;</div>
                     }
                 </summary>
@@ -76,7 +73,7 @@
                     }
                     @if (isMultipart == true)
                     {
-                        <div>[TraceFilter(Enable = false)]</div>
+                        <div>[LoggingFilter(Enable = false)]</div>
                     }
                     <div>[Http@(method.HttpMethodUpper)("@(method.Path)")]</div>
                 </attributes>
@@ -92,15 +89,14 @@
                                 <span>[Required]</span>
                             }
 
-                            if (parameter.VariableName != parameter.Name&& parameter.Kind != OpenApiParameterKind.Header)
+                            if (parameter.VariableName != parameter.Name && parameter.Kind != OpenApiParameterKind.Header)
                             {
                                 <span>[AliasAs("@(parameter.Name)")]</span>
                             }
 
                             if (parameter.Kind == OpenApiParameterKind.Path || parameter.Kind == OpenApiParameterKind.Query)
                             {
-                                var schema = parameter.Schema as NSwag.OpenApiParameter;
-                                if (schema != null && schema.CollectionFormat != OpenApiParameterCollectionFormat.Undefined 
+                                if (parameter.Schema is OpenApiParameter schema && schema.CollectionFormat != OpenApiParameterCollectionFormat.Undefined
                                     && schema.CollectionFormat != OpenApiParameterCollectionFormat.Multi)
                                 {
                                     <span>[PathQuery(CollectionFormat = CollectionFormat.@(schema.CollectionFormat))]</span>
@@ -114,28 +110,32 @@
                             {
                                 <span>[XmlContent]</span>
                             }
-                            else if (parameter.Kind == OpenApiParameterKind.Body)
-                            {
-                                <span>[JsonContent]</span>
-                            }
                             else if (parameter.Kind == OpenApiParameterKind.FormData)
                             {
                                 if (parameter.IsFile == false)
                                 {
-                                    if (isMultipart == true)
+                                    if (method.ConsumesFormUrlEncoded)
                                     {
-                                        <span>[MulitpartContent]</span>
+                                        <span>[FormField]</span>
                                     }
                                     else
                                     {
-                                        <span>[FormContent]</span>
+                                        <span>[FormDataText]</span>
                                     }
+                                }
+                            }
+                            else if (parameter.Kind == OpenApiParameterKind.Body)
+                            {
+                                if (parameter.IsBinaryBody == false)
+                                {
+                                    <span>[JsonContent]</span>
                                 }
                             }
 
                             <span>@(parameter.TypeInControllerInterface)</span>
-                            <span>@(parameter.VariableName)@(parameter.IsLast ? null : ",")</span>
+                            <span>@(parameter.VariableName), </span>
                         }
+                        <span>CancellationToken cancellationToken = default</span>
                     </parameters>
                     <span>);</span>
                 </div>

@@ -14,7 +14,7 @@ namespace WebApiClient.Tools.Swagger
     [DebuggerDisplay("TypeName = {TypeName}")]
     public class HttpApi : CSharpControllerTemplateModel
     {
-        public string NameSpace { get; } = "WebApiClient";
+        public string NameSpace { get; } = "WebApiClientCore";
 
         /// <summary>
         /// 获取接口名称

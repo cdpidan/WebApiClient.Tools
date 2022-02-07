@@ -67,16 +67,22 @@ namespace WebApiClient.Tools.Swagger
                     continue;
                 }
 
+                if (line.Contains("Newtonsoft.Json.JsonConverter"))
+                {
+                    continue;
+                }
+
                 var match = new Regex("(?<=Newtonsoft.Json.JsonProperty\\(\")\\w+(?=\")").Match(line);
                 if (match.Success == true)
                 {
-                    builder.AppendLine($"[AliasAs(\"{match.Value}\")]");
+                    builder.AppendLine($"[JsonPropertyName(\"{match.Value}\")]");
                     continue;
                 }
 
                 var cleaned = line
                     .Replace("partial class", "class")
                     .Replace("System.Collections.Generic.", null)
+                    .Replace("System.Runtime.Serialization.",null)
                     .Replace("System.ComponentModel.DataAnnotations.", null);
 
                 builder.AppendLine(cleaned);

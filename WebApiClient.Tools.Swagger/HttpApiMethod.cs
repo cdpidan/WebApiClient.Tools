@@ -75,7 +75,7 @@ namespace WebApiClient.Tools.Swagger
 
         /// <summary>
         /// 解析参数名称
-        /// 将文件参数声明为MulitpartFile
+        /// 将文件参数声明为FormDataFile
         /// </summary>
         /// <param name="parameter">参数</param>
         /// <returns></returns>
@@ -87,10 +87,10 @@ namespace WebApiClient.Tools.Swagger
                 if (parameter.CollectionFormat == OpenApiParameterCollectionFormat.Multi &&
                     !schema.Type.HasFlag(JsonObjectType.Array))
                 {
-                    return "IEnumerable<MulitpartFile>";
+                    return "IEnumerable<FormDataFile>";
                 }
 
-                return "MulitpartFile";
+                return "FormDataFile";
             }
 
             return base.ResolveParameterType(parameter);
