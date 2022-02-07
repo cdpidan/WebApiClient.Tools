@@ -1,4 +1,5 @@
 ﻿using NJsonSchema.CodeGeneration;
+using NJsonSchema.CodeGeneration.CSharp;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -11,16 +12,22 @@ namespace WebApiClient.Tools.Swagger
         /// 获取使用的命名空间
         /// </summary>
         public string NameSpace { get; }
+        
+        /// <summary>
+        /// UseSystemTextJson
+        /// </summary>
+        public bool UseSystemTextJson { get; }
 
         /// <summary>
         /// WebApiClient的模型描述
         /// </summary>
         /// <param name="codeArtifact">源代码</param>
-        /// <param name="nameSpace">命名空间</param>
-        public HttpModel(CodeArtifact codeArtifact, string nameSpace)
+        /// <param name="settings">命名空间</param>
+        public HttpModel(CodeArtifact codeArtifact, HttpApiSettings settings)
             : base(codeArtifact)
         {
-            NameSpace = nameSpace;
+            NameSpace = settings.NameSpace;
+            UseSystemTextJson = settings.CSharpGeneratorSettings.JsonLibrary == CSharpJsonLibrary.SystemTextJson;
         }
 
         /// <summary>

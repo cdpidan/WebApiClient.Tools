@@ -128,7 +128,14 @@
                             {
                                 if (parameter.IsBinaryBody == false)
                                 {
-                                    <span>[JsonContent]</span>
+                                    if (Model.UseSystemTextJson)
+                                    {
+                                        <span>[JsonContent]</span>
+                                    }
+                                    else
+                                    {
+                                        <span>[JsonNetContent]</span>
+                                    }
                                 }
                             }
 

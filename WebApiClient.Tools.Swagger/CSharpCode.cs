@@ -75,7 +75,14 @@ namespace WebApiClient.Tools.Swagger
                 var match = new Regex("(?<=Newtonsoft.Json.JsonProperty\\(\")\\w+(?=\")").Match(line);
                 if (match.Success == true)
                 {
-                    builder.AppendLine($"[JsonPropertyName(\"{match.Value}\")]");
+                    builder.AppendLine($"[JsonProperty(\"{match.Value}\")]");
+                    continue;
+                }
+
+                var match2 = new Regex("(?<=System.Text.Json.Serialization.JsonPropertyName\\(\")\\w+(?=\")").Match(line);
+                if (match2.Success == true)
+                {
+                    builder.AppendLine($"[JsonPropertyName(\"{match2.Value}\")]");
                     continue;
                 }
 

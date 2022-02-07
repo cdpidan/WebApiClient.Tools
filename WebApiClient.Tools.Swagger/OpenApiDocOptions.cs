@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using NJsonSchema.CodeGeneration.CSharp;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -25,5 +26,11 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         [Option('t', "task", MetaValue = "TaskReturnType", Required = false, HelpText = "Task返回值类型，如: ITask、Task")]
         public string TaskReturnType { get; set; }
+
+        /// <summary>
+        /// Json类型
+        /// </summary>
+        [Option('l', "library", MetaValue = "JsonLibrary", Required = false, HelpText = "Json类型：0 NewtonsoftJson；1 SystemTextJson")]
+        public CSharpJsonLibrary JsonLibrary { get; set; }
     }
 }

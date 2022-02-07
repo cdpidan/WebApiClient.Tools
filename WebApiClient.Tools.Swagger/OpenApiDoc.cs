@@ -45,6 +45,8 @@ namespace WebApiClient.Tools.Swagger
             {
                 Settings.TaskReturnType = options.TaskReturnType;
             }
+
+            Settings.CSharpGeneratorSettings.JsonLibrary = options.JsonLibrary;
         }
 
         /// <summary>
@@ -153,7 +155,7 @@ namespace WebApiClient.Tools.Swagger
             {
                 var model = new HttpApi(controllerClassName, operations, _openApiDoc.Document, _openApiDoc.Settings);
                 _httpApiList.Add(model);
-                return new CodeArtifact[0];
+                return Array.Empty<CodeArtifact>();
             }
 
             /// <summary>
@@ -208,7 +210,7 @@ namespace WebApiClient.Tools.Swagger
             public HttpModel[] GetHttpModels()
             {
                 return GenerateTypes()
-                    .Select(item => new HttpModel(item, _openApiDoc.Settings.NameSpace))
+                    .Select(item => new HttpModel(item, _openApiDoc.Settings))
                     .ToArray();
             }
         }

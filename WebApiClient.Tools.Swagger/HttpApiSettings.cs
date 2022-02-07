@@ -19,7 +19,7 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 获取或设置命名空间
         /// </summary>
-        public string NameSpace { get; set; } = "WebApiClient";
+        public string NameSpace { get; set; } = "WebApiClientCore";
 
         /// <summary> 
         /// Task返回值类型，默认为:ITask
@@ -42,6 +42,7 @@ namespace WebApiClient.Tools.Swagger
             CSharpGeneratorSettings.TypeNameGenerator = new TypeNameProvider();
             CSharpGeneratorSettings.ClassStyle = CSharpClassStyle.Poco;
             CSharpGeneratorSettings.GenerateJsonMethods = false;
+            CSharpGeneratorSettings.JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
             RouteNamingStrategy = CSharpControllerRouteNamingStrategy.OperationId;
         }
 
