@@ -40,6 +40,7 @@ namespace WebApiClient.Tools.Swagger
                 switch (SyncResultType)
                 {
                     case "void":
+                        return "Task";
                     case "FileResult":
                         return $"{_settingsTaskReturnType}<HttpResponseMessage>";
                     default:
