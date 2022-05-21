@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System.Collections.Generic;
+using CommandLine;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -25,5 +26,17 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         [Option('t', "task", MetaValue = "TaskReturnType", Required = false, HelpText = "Task返回值类型，如: ITask、Task")]
         public string TaskReturnType { get; set; }
+
+        /// <summary>
+        /// 忽略的API路径
+        /// </summary>
+        [Option('p', "IgnorePaths", HelpText = "忽略的API路径")]
+        public IEnumerable<string> IgnorePaths { get; set; }
+
+        /// <summary>
+        /// 忽略的实体定义
+        /// </summary>
+        [Option('d', "IgnoreDefinitions", HelpText = "忽略的实体定义")]
+        public IEnumerable<string> IgnoreDefinitions { get; set; }
     }
 }

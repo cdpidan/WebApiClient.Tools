@@ -9,6 +9,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using NJsonSchema.Infrastructure;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -33,7 +38,7 @@ namespace WebApiClient.Tools.Swagger
         /// Swagger描述
         /// </summary>
         /// <param name="options">选项</param>
-        public OpenApiDoc(OpenApiDocOptions options) : this(GetDocument(options.OpenApi))
+        public OpenApiDoc(OpenApiDocOptions options) : this(GetDocument(options))
         {
             if (string.IsNullOrEmpty(options.Namespace) == false)
             {
@@ -63,17 +68,84 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 获取swagger文档
         /// </summary>
-        /// <param name="swagger"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
-        private static OpenApiDocument GetDocument(string swagger)
+        private static OpenApiDocument GetDocument(OpenApiDocOptions options)
         {
+            var swagger = options.OpenApi;
             Console.WriteLine($"正在分析OpenApi：{swagger}");
             if (Uri.TryCreate(swagger, UriKind.Absolute, out _))
             {
-                return OpenApiDocument.FromUrlAsync(swagger).Result;
+                return FromUrlAsync(options).GetAwaiter().GetResult();
             }
 
-            return OpenApiDocument.FromFileAsync(swagger).Result;
+            return OpenApiDocument.FromFileAsync(swagger).GetAwaiter().GetResult();
+        }
+
+        private static async Task<OpenApiDocument> FromUrlAsync(OpenApiDocOptions options,
+            CancellationToken cancellationToken = default)
+        {
+            var data = await DynamicApis.HttpGetAsync(options.OpenApi, cancellationToken).ConfigureAwait(false);
+            var jObject = JObject.Parse(data);
+            var paths = (JObject) jObject.SelectToken("paths");
+            var definitions = (JObject) jObject.SelectToken("definitions");
+
+            // 处理json错误
+            OpenApiDocument openApiDocument;
+            while (true)
+            {
+                try
+                {
+                    openApiDocument = await OpenApiDocument
+                        .FromJsonAsync(jObject.ToString(), options.OpenApi, cancellationToken)
+                        .ConfigureAwait(false);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    var match = Regex.Match(e.Message, "Could not resolve the path '(.*?)'.");
+                    if (e.Source != "NJsonSchema" || !match.Success) throw;
+
+                    var processed = false;
+                    if (paths != null)
+                    {
+                        foreach (var path in paths)
+                        {
+                            if (path.Value?.ToString().Contains($"\"{match.Groups[1].Value}\"") != true)
+                                continue;
+
+                            Console.WriteLine($"解析swagger文档异常：{e.Message}，准备移除Path");
+                            paths.Property(path.Key)?.Remove();
+                            processed = true;
+                            break;
+                        }
+                    }
+
+                    if (!processed && definitions != null)
+                    {
+                        foreach (var definition in definitions)
+                        {
+                            if (definition.Value?.ToString().Contains($"\"{match.Groups[1].Value}\"") != true) continue;
+
+                            Console.WriteLine($"解析swagger文档异常：{e.Message}，准备移除Definition");
+                            definitions.Property(definition.Key)?.Remove();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            foreach (var path in options.IgnorePaths)
+            {
+                paths?.Property(path)?.Remove();
+            }
+
+            foreach (var definition in options.IgnoreDefinitions)
+            {
+                definitions?.Property(definition)?.Remove();
+            }
+
+            return openApiDocument;
         }
 
         /// <summary>
