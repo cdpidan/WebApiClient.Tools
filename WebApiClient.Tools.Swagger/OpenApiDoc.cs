@@ -86,6 +86,12 @@ namespace WebApiClient.Tools.Swagger
             CancellationToken cancellationToken = default)
         {
             var data = await DynamicApis.HttpGetAsync(options.OpenApi, cancellationToken).ConfigureAwait(false);
+            if (data.Contains('&'))
+            {
+                Console.WriteLine("包含字符：&");
+                data = data.Replace('&', '＆');
+            }
+
             var jObject = JObject.Parse(data);
             var paths = (JObject) jObject.SelectToken("paths");
             var definitions = (JObject) jObject.SelectToken("definitions");
