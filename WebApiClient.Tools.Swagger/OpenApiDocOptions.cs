@@ -38,5 +38,11 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         [Option('d', "IgnoreDefinitions", HelpText = "忽略的实体定义")]
         public IEnumerable<string> IgnoreDefinitions { get; set; }
+
+        /// <summary>
+        /// 只生成这些接口
+        /// </summary>
+        [Option('l', "ApiList", HelpText = "只生成这些接口")]
+        public IEnumerable<string> ApiList { get; set; }
     }
 }

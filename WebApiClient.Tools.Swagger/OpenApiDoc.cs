@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Infrastructure;
 
@@ -96,6 +97,40 @@ namespace WebApiClient.Tools.Swagger
             var paths = (JObject) jObject.SelectToken("paths");
             var definitions = (JObject) jObject.SelectToken("definitions");
 
+            // 移除path
+            foreach (var path in options.IgnorePaths)
+            {
+                paths?.Property(path)?.Remove();
+            }
+
+            // 移除definition
+            foreach (var definition in options.IgnoreDefinitions)
+            {
+                definitions?.Property(definition)?.Remove();
+            }
+
+            // 只生成部分API
+            if (options.ApiList.Any() && paths != null && definitions != null)
+            {
+                var properties = paths.Properties().ToList();
+                foreach (var property in properties.Where(property => !options.ApiList.Contains(property.Name)))
+                {
+                    paths.Property(property.Name)?.Remove();
+                }
+
+                var definitionsHashSet = new HashSet<string>();
+                foreach (var item in GetDefinitionsFromJson(paths))
+                {
+                    ProcessChild(definitionsHashSet, definitions, item);
+                }
+
+                var list = definitions.Properties().ToList();
+                foreach (var definition in list.Where(definition => !definitionsHashSet.Contains(definition.Name)))
+                {
+                    definitions.Property(definition.Name)?.Remove();
+                }
+            }
+
             // 处理json错误
             OpenApiDocument openApiDocument;
             while (true)
@@ -141,17 +176,35 @@ namespace WebApiClient.Tools.Swagger
                 }
             }
 
-            foreach (var path in options.IgnorePaths)
-            {
-                paths?.Property(path)?.Remove();
-            }
-
-            foreach (var definition in options.IgnoreDefinitions)
-            {
-                definitions?.Property(definition)?.Remove();
-            }
-
             return openApiDocument;
+        }
+
+        /// <summary>
+        /// 递归处理实体
+        /// </summary>
+        /// <param name="definitionsHashSet"></param>
+        /// <param name="definitions"></param>
+        /// <param name="modelName"></param>
+        private static void ProcessChild(HashSet<string> definitionsHashSet, JObject definitions, string modelName)
+        {
+            definitionsHashSet.Add(modelName);
+            foreach (var definition in definitions)
+            {
+                if (definition.Key != modelName) continue;
+
+                foreach (var child in GetDefinitionsFromJson(definition.Value))
+                {
+                    ProcessChild(definitionsHashSet, definitions, child);
+                }
+            }
+        }
+
+        private static IEnumerable<string> GetDefinitionsFromJson<T>(T paths)
+        {
+            var json = JsonConvert.SerializeObject(paths);
+            var matches = Regex.Matches(json, "(?s)\"\\$ref\":\"#/definitions/(.*?)\"");
+            var definitionList = matches.Where(x => x.Success).Select(x => x.Groups[1].Value);
+            return definitionList;
         }
 
         /// <summary>

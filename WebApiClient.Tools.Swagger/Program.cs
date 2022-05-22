@@ -1,4 +1,6 @@
-﻿using CommandLine;
+﻿using System;
+using CommandLine;
+using Newtonsoft.Json;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -10,6 +12,7 @@ namespace WebApiClient.Tools.Swagger
                 .ParseArguments<OpenApiDocOptions>(args)
                 .WithParsed(options =>
                 {
+                    Console.WriteLine(JsonConvert.SerializeObject(options));
                     var swagger = new OpenApiDoc(options);
                     swagger.GenerateFiles();
                 });
