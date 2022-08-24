@@ -94,8 +94,8 @@ namespace WebApiClient.Tools.Swagger
             }
 
             var jObject = JObject.Parse(data);
-            var paths = (JObject) jObject.SelectToken("paths");
-            var definitions = (JObject) jObject.SelectToken("definitions");
+            var paths = (JObject)jObject.SelectToken("paths");
+            var definitions = (JObject)jObject.SelectToken("definitions");
 
             // 移除path
             foreach (var path in options.IgnorePaths)
@@ -119,7 +119,7 @@ namespace WebApiClient.Tools.Swagger
                 }
 
                 var definitionsHashSet = new HashSet<string>();
-                foreach (var item in GetDefinitionsFromJson(paths))
+                foreach (var item in GetDefinitionsFromJson(null, paths))
                 {
                     ProcessChild(definitionsHashSet, definitions, item);
                 }
@@ -185,25 +185,27 @@ namespace WebApiClient.Tools.Swagger
         /// <param name="definitionsHashSet"></param>
         /// <param name="definitions"></param>
         /// <param name="modelName"></param>
-        private static void ProcessChild(HashSet<string> definitionsHashSet, JObject definitions, string modelName)
+        private static void ProcessChild(ISet<string> definitionsHashSet, JObject definitions, string modelName)
         {
             definitionsHashSet.Add(modelName);
             foreach (var definition in definitions)
             {
                 if (definition.Key != modelName) continue;
 
-                foreach (var child in GetDefinitionsFromJson(definition.Value))
+                foreach (var child in GetDefinitionsFromJson(modelName, definition.Value))
                 {
                     ProcessChild(definitionsHashSet, definitions, child);
                 }
             }
         }
 
-        private static IEnumerable<string> GetDefinitionsFromJson<T>(T paths)
+        private static IEnumerable<string> GetDefinitionsFromJson<T>(string currentModelName, T paths)
         {
             var json = JsonConvert.SerializeObject(paths);
             var matches = Regex.Matches(json, "(?s)\"\\$ref\":\"#/definitions/(.*?)\"");
-            var definitionList = matches.Where(x => x.Success).Select(x => x.Groups[1].Value);
+            var definitionList = matches.Where(x => x.Success)
+                .Select(x => x.Groups[1].Value)
+                .Where(x => x != currentModelName); //需要排除当前模型，不然会死循环
             return definitionList;
         }
 
@@ -307,8 +309,8 @@ namespace WebApiClient.Tools.Swagger
             protected override CSharpOperationModel CreateOperationModel(OpenApiOperation operation,
                 ClientGeneratorBaseSettings settings)
             {
-                return new HttpApiMethod(operation, (CSharpGeneratorBaseSettings) settings, this,
-                    (CSharpTypeResolver) Resolver, _openApiDoc.Settings.TaskReturnType);
+                return new HttpApiMethod(operation, (CSharpGeneratorBaseSettings)settings, this,
+                    (CSharpTypeResolver)Resolver, _openApiDoc.Settings.TaskReturnType);
             }
         }
 
