@@ -9,6 +9,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NJsonSchema.Infrastructure;
 
 namespace WebApiClient.Tools.Swagger
 {
@@ -33,7 +39,7 @@ namespace WebApiClient.Tools.Swagger
         /// Swagger描述
         /// </summary>
         /// <param name="options">选项</param>
-        public OpenApiDoc(OpenApiDocOptions options) : this(GetDocument(options.OpenApi))
+        public OpenApiDoc(OpenApiDocOptions options) : this(GetDocument(options))
         {
             if (string.IsNullOrEmpty(options.Namespace) == false)
             {
@@ -65,17 +71,144 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 获取swagger文档
         /// </summary>
-        /// <param name="swagger"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
-        private static OpenApiDocument GetDocument(string swagger)
+        private static OpenApiDocument GetDocument(OpenApiDocOptions options)
         {
+            var swagger = options.OpenApi;
             Console.WriteLine($"正在分析OpenApi：{swagger}");
             if (Uri.TryCreate(swagger, UriKind.Absolute, out _))
             {
-                return OpenApiDocument.FromUrlAsync(swagger).Result;
+                return FromUrlAsync(options).GetAwaiter().GetResult();
             }
 
-            return OpenApiDocument.FromFileAsync(swagger).Result;
+            return OpenApiDocument.FromFileAsync(swagger).GetAwaiter().GetResult();
+        }
+
+        private static async Task<OpenApiDocument> FromUrlAsync(OpenApiDocOptions options,
+            CancellationToken cancellationToken = default)
+        {
+            var data = await DynamicApis.HttpGetAsync(options.OpenApi, cancellationToken).ConfigureAwait(false);
+            if (data.Contains('&'))
+            {
+                Console.WriteLine("包含字符：&");
+                data = data.Replace('&', '＆');
+            }
+
+            var jObject = JObject.Parse(data);
+            var paths = (JObject)jObject.SelectToken("paths");
+            var definitions = (JObject)jObject.SelectToken("definitions");
+
+            // 移除path
+            foreach (var path in options.IgnorePaths)
+            {
+                paths?.Property(path)?.Remove();
+            }
+
+            // 移除definition
+            foreach (var definition in options.IgnoreDefinitions)
+            {
+                definitions?.Property(definition)?.Remove();
+            }
+
+            // 只生成部分API
+            if (options.ApiList.Any() && paths != null && definitions != null)
+            {
+                var properties = paths.Properties().ToList();
+                foreach (var property in properties.Where(property => !options.ApiList.Contains(property.Name)))
+                {
+                    paths.Property(property.Name)?.Remove();
+                }
+
+                var definitionsHashSet = new HashSet<string>();
+                foreach (var item in GetDefinitionsFromJson(null, paths))
+                {
+                    ProcessChild(definitionsHashSet, definitions, item);
+                }
+
+                var list = definitions.Properties().ToList();
+                foreach (var definition in list.Where(definition => !definitionsHashSet.Contains(definition.Name)))
+                {
+                    definitions.Property(definition.Name)?.Remove();
+                }
+            }
+
+            // 处理json错误
+            OpenApiDocument openApiDocument;
+            while (true)
+            {
+                try
+                {
+                    openApiDocument = await OpenApiDocument
+                        .FromJsonAsync(jObject.ToString(), options.OpenApi, cancellationToken)
+                        .ConfigureAwait(false);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    var match = Regex.Match(e.Message, "Could not resolve the path '(.*?)'.");
+                    if (e.Source != "NJsonSchema" || !match.Success) throw;
+
+                    var processed = false;
+                    if (paths != null)
+                    {
+                        foreach (var path in paths)
+                        {
+                            if (path.Value?.ToString().Contains($"\"{match.Groups[1].Value}\"") != true)
+                                continue;
+
+                            Console.WriteLine($"解析swagger文档异常：{e.Message}，准备移除Path");
+                            paths.Property(path.Key)?.Remove();
+                            processed = true;
+                            break;
+                        }
+                    }
+
+                    if (!processed && definitions != null)
+                    {
+                        foreach (var definition in definitions)
+                        {
+                            if (definition.Value?.ToString().Contains($"\"{match.Groups[1].Value}\"") != true) continue;
+
+                            Console.WriteLine($"解析swagger文档异常：{e.Message}，准备移除Definition");
+                            definitions.Property(definition.Key)?.Remove();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return openApiDocument;
+        }
+
+        /// <summary>
+        /// 递归处理实体
+        /// </summary>
+        /// <param name="definitionsHashSet"></param>
+        /// <param name="definitions"></param>
+        /// <param name="modelName"></param>
+        private static void ProcessChild(ISet<string> definitionsHashSet, JObject definitions, string modelName)
+        {
+            definitionsHashSet.Add(modelName);
+            foreach (var definition in definitions)
+            {
+                if (definition.Key != modelName) continue;
+
+                foreach (var child in GetDefinitionsFromJson(modelName, definition.Value))
+                {
+                    ProcessChild(definitionsHashSet, definitions, child);
+                }
+            }
+        }
+
+        private static IEnumerable<string> GetDefinitionsFromJson<T>(string currentModelName, T paths)
+        {
+            var json = JsonConvert.SerializeObject(paths);
+            var matches = Regex.Matches(json, "(?s)\"\\$ref\":\"#/definitions/(.*?)\"");
+            var definitionList = matches.Where(x => x.Success)
+                .Select(x => x.Groups[1].Value)
+                .Where(x => x != currentModelName); //需要排除当前模型，不然会死循环
+            return definitionList;
         }
 
         /// <summary>
@@ -178,8 +311,8 @@ namespace WebApiClient.Tools.Swagger
             protected override CSharpOperationModel CreateOperationModel(OpenApiOperation operation,
                 ClientGeneratorBaseSettings settings)
             {
-                return new HttpApiMethod(operation, (CSharpGeneratorBaseSettings) settings, this,
-                    (CSharpTypeResolver) Resolver, _openApiDoc.Settings.TaskReturnType);
+                return new HttpApiMethod(operation, (CSharpGeneratorBaseSettings)settings, this,
+                    (CSharpTypeResolver)Resolver, _openApiDoc.Settings.TaskReturnType);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System.Collections.Generic;
+using CommandLine;
 using NJsonSchema.CodeGeneration.CSharp;
 
 namespace WebApiClient.Tools.Swagger
@@ -28,9 +29,27 @@ namespace WebApiClient.Tools.Swagger
         public string TaskReturnType { get; set; }
 
         /// <summary>
+        /// 忽略的API路径
+        /// </summary>
+        [Option('p', "IgnorePaths", HelpText = "忽略的API路径")]
+        public IEnumerable<string> IgnorePaths { get; set; }
+
+        /// <summary>
+        /// 忽略的实体定义
+        /// </summary>
+        [Option('d', "IgnoreDefinitions", HelpText = "忽略的实体定义")]
+        public IEnumerable<string> IgnoreDefinitions { get; set; }
+
+        /// <summary>
+        /// 只生成这些接口
+        /// </summary>
+        [Option('l', "ApiList", HelpText = "只生成这些接口")]
+        public IEnumerable<string> ApiList { get; set; }
+
+        /// <summary>
         /// Json类型
         /// </summary>
-        [Option('l', "library", MetaValue = "JsonLibrary", Required = false, HelpText = "Json类型：0 NewtonsoftJson；1 SystemTextJson")]
+        [Option('j', "library", MetaValue = "JsonLibrary", Required = false, HelpText = "Json类型：0 NewtonsoftJson；1 SystemTextJson")]
         public CSharpJsonLibrary JsonLibrary { get; set; }
     }
 }
