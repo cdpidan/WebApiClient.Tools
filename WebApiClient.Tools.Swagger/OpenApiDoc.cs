@@ -53,6 +53,7 @@ namespace WebApiClient.Tools.Swagger
             }
 
             Settings.Reverse = options.Reverse;
+            Settings.ApiPrefix = options.ApiPrefix ?? string.Empty;
         }
 
         /// <summary>
@@ -288,7 +289,7 @@ namespace WebApiClient.Tools.Swagger
             {
                 var model = new HttpApi(controllerClassName, operations, _openApiDoc.Document, _openApiDoc.Settings);
                 _httpApiList.Add(model);
-                return new CodeArtifact[0];
+                return Array.Empty<CodeArtifact>();
             }
 
             /// <summary>

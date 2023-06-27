@@ -32,6 +32,11 @@ namespace WebApiClient.Tools.Swagger
         public bool Reverse { get; set; }
 
         /// <summary>
+        /// 反转ControllerName和Summary
+        /// </summary>
+        public string ApiPrefix { get; set; }
+
+        /// <summary>
         /// WebApiClient接口设置模型
         /// </summary>
         public HttpApiSettings()
@@ -41,6 +46,7 @@ namespace WebApiClient.Tools.Swagger
             ParameterArrayType = "IEnumerable";
             ParameterDictionaryType = "IDictionary";
             TaskReturnType = "ITask";
+            ApiPrefix = string.Empty;
 
             OperationNameGenerator = new OperationNameProvider();
             ParameterNameGenerator = new ParameterNameProvider();

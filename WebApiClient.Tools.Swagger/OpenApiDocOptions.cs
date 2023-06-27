@@ -50,5 +50,11 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         [Option('r', "reverse", HelpText = "反转ControllerName和Summary")]
         public bool Reverse { get; set; }
+
+        /// <summary>
+        /// 反转ControllerName和Summary
+        /// </summary>
+        [Option('f', "prefix", HelpText = "API接口前缀")]
+        public string ApiPrefix { get; set; }
     }
 }
