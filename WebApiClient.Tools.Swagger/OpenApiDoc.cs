@@ -51,6 +51,8 @@ namespace WebApiClient.Tools.Swagger
             {
                 Settings.TaskReturnType = options.TaskReturnType;
             }
+
+            Settings.Reverse = options.Reverse;
         }
 
         /// <summary>

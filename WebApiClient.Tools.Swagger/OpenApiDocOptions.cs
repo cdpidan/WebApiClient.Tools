@@ -44,5 +44,11 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         [Option('l', "ApiList", HelpText = "只生成这些接口")]
         public IEnumerable<string> ApiList { get; set; }
+
+        /// <summary>
+        /// 反转ControllerName和Summary
+        /// </summary>
+        [Option('r', "reverse", HelpText = "反转ControllerName和Summary")]
+        public bool Reverse { get; set; }
     }
 }
