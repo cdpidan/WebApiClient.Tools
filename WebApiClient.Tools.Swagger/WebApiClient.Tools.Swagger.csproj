@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.19.0" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="13.20.0" />
     <PackageReference Include="RazorEngineCore" Version="2022.8.1" />
   </ItemGroup>
 
