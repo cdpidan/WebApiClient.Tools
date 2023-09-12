@@ -27,6 +27,16 @@ namespace WebApiClient.Tools.Swagger
         public string TaskReturnType { get; set; }
 
         /// <summary>
+        /// 反转ControllerName和Summary
+        /// </summary>
+        public bool Reverse { get; set; }
+
+        /// <summary>
+        /// 反转ControllerName和Summary
+        /// </summary>
+        public string ApiPrefix { get; set; }
+
+        /// <summary>
         /// WebApiClient接口设置模型
         /// </summary>
         public HttpApiSettings()
@@ -36,6 +46,7 @@ namespace WebApiClient.Tools.Swagger
             ParameterArrayType = "IEnumerable";
             ParameterDictionaryType = "IDictionary";
             TaskReturnType = "ITask";
+            ApiPrefix = string.Empty;
 
             OperationNameGenerator = new OperationNameProvider();
             ParameterNameGenerator = new ParameterNameProvider();
@@ -112,7 +123,7 @@ namespace WebApiClient.Tools.Swagger
                 }
 
                 var charArray = name.ToCharArray();
-                for (int i = 0; i < charArray.Length; i++)
+                for (var i = 0; i < charArray.Length; i++)
                 {
                     if (i == 1 && char.IsUpper(charArray[i]) == false)
                     {
@@ -183,7 +194,7 @@ namespace WebApiClient.Tools.Swagger
                 var index = -1;
                 return Regex.Replace(name, @"\W", m =>
                 {
-                    index = index + 1;
+                    index += 1;
                     return index < matches.Count / 2 ? "Of" : null;
                 });
             }

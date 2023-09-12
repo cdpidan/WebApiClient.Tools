@@ -45,8 +45,11 @@ namespace WebApiClient.Tools.Swagger
             var tag = document.Tags
                 .FirstOrDefault(item => string.Equals(item.Name, className, StringComparison.OrdinalIgnoreCase));
 
-            TypeName = $"I{Class}Api";
-            Summary = tag?.Description;
+            var reverse = settings.Reverse && !string.IsNullOrWhiteSpace(tag?.Description);
+            TypeName = reverse
+                ? $"I{settings.ApiPrefix}{tag.Description.Replace(" ", "")}Api"
+                : $"I{settings.ApiPrefix}{Class}Api";
+            Summary = reverse ? Class : tag?.Description;
             NameSpace = settings.NameSpace;
         }
 

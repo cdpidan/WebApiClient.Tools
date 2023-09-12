@@ -52,6 +52,8 @@ namespace WebApiClient.Tools.Swagger
                 Settings.TaskReturnType = options.TaskReturnType;
             }
 
+            Settings.Reverse = options.Reverse;
+            Settings.ApiPrefix = options.ApiPrefix ?? string.Empty;
             Settings.CSharpGeneratorSettings.JsonLibrary = options.JsonLibrary;
         }
 

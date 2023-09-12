@@ -47,6 +47,18 @@ namespace WebApiClient.Tools.Swagger
         public IEnumerable<string> ApiList { get; set; }
 
         /// <summary>
+        /// 反转ControllerName和Summary
+        /// </summary>
+        [Option('r', "reverse", HelpText = "反转ControllerName和Summary")]
+        public bool Reverse { get; set; }
+
+        /// <summary>
+        /// 反转ControllerName和Summary
+        /// </summary>
+        [Option('f', "prefix", HelpText = "API接口前缀")]
+        public string ApiPrefix { get; set; }
+
+        /// <summary>
         /// Json类型
         /// </summary>
         [Option('j', "library", MetaValue = "JsonLibrary", Required = false, HelpText = "Json类型：0 NewtonsoftJson；1 SystemTextJson")]
