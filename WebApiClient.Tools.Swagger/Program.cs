@@ -15,7 +15,8 @@ namespace WebApiClient.Tools.Swagger
                     Console.WriteLine(JsonConvert.SerializeObject(options));
                     var swagger = new OpenApiDoc(options);
                     swagger.GenerateFiles();
-                });
+                })
+                .WithNotParsed(errors => errors.Output());
         }
     }
 }
