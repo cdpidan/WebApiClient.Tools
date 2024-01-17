@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <Authors>xljiulang</Authors>
     <Company>xljiulang</Company>
     <Copyright>Copyright © xljiulang 2018</Copyright>
@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.0.0" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.0.2" />
     <PackageReference Include="RazorEngineCore" Version="2023.11.2" />
   </ItemGroup>
 
