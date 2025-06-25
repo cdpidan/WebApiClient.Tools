@@ -52,9 +52,15 @@ namespace WebApiClient.Tools.Swagger
         public bool Reverse { get; set; }
 
         /// <summary>
-        /// 反转ControllerName和Summary
+        /// API接口前缀
         /// </summary>
         [Option('f', "prefix", HelpText = "API接口前缀")]
         public string ApiPrefix { get; set; }
+
+        /// <summary>
+        /// 接口基础路径
+        /// </summary>
+        [Option('b', "basePath", HelpText = "接口基础路径")]
+        public string BasePath { get; set; }
     }
 }

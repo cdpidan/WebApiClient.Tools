@@ -90,6 +90,13 @@ namespace WebApiClient.Tools.Swagger
             CancellationToken cancellationToken = default)
         {
             var data = await DynamicApis.HttpGetAsync(options.OpenApi, cancellationToken).ConfigureAwait(false);
+
+            // 移除BasePath
+            if (!string.IsNullOrWhiteSpace(options.BasePath) && data.Contains($"\"{options.BasePath}/"))
+            {
+                data = data.Replace($"\"{options.BasePath}/", "\"/");
+            }
+
             if (data.Contains('&'))
             {
                 Console.WriteLine("包含字符：&");
