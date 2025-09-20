@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -58,19 +59,48 @@ namespace WebApiClient.Tools.Swagger
         private static string TransformCode(string nswagCode)
         {
             var builder = new StringBuilder();
-            var lines = GetLines(nswagCode);
+            var lines = GetLines(nswagCode).ToList();
+            var hasDateTimeFormat = false;
+            var hasDateFormat = false;
+            var lineNum = 0;
 
             foreach (var line in lines)
             {
+                lineNum++;
                 if (line.Contains("System.CodeDom.Compiler.GeneratedCode"))
                 {
                     continue;
                 }
 
+                if (Regex.IsMatch(line,"格式[:： ]{0,}yyyy-MM-dd HH:mm:ss"))
+                {
+                    hasDateTimeFormat = true;
+                }
+
+                if (Regex.IsMatch(line,"格式[:： ]{0,}yyyy-MM-dd"))
+                {
+                    hasDateFormat = true;
+                }
+
                 var match = new Regex("(?<=Newtonsoft.Json.JsonProperty\\(\")\\w+(?=\")").Match(line);
-                if (match.Success == true)
+                if (match.Success)
                 {
                     builder.AppendLine($"[AliasAs(\"{match.Value}\")]");
+
+                    if (lineNum < lines.Count && lines[lineNum].Contains("DateTime"))
+                    {
+                        if (hasDateTimeFormat)
+                        {
+                            builder.AppendLine("[DateTimeFormat(\"yyyy-MM-dd HH:mm:ss\")]");
+                        }
+                        else if (hasDateFormat)
+                        {
+                            builder.AppendLine("[DateTimeFormat(\"yyyy-MM-dd\")]");
+                        }
+                    }
+
+                    hasDateTimeFormat = false;
+                    hasDateFormat = false;
                     continue;
                 }
 
