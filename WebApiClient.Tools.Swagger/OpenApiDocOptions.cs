@@ -30,7 +30,7 @@ namespace WebApiClient.Tools.Swagger
         /// <summary>
         /// 忽略的API路径
         /// </summary>
-        [Option('p', "IgnorePaths", HelpText = "忽略的API路径")]
+        [Option('i', "IgnorePaths", HelpText = "忽略的API路径")]
         public IEnumerable<string> IgnorePaths { get; set; }
 
         /// <summary>
@@ -62,5 +62,17 @@ namespace WebApiClient.Tools.Swagger
         /// </summary>
         [Option('b', "basePath", HelpText = "接口基础路径")]
         public string BasePath { get; set; }
+
+        /// <summary>
+        /// 接口Basic认证的用户名
+        /// </summary>
+        [Option('u', "username", HelpText = "接口Basic认证的用户名")]
+        public string BasicUserName { get; set; }
+
+        /// <summary>
+        /// 接口Basic认证的密码
+        /// </summary>
+        [Option('p', "password", HelpText = "接口Basic认证的密码")]
+        public string BasicPassword { get; set; }
     }
 }

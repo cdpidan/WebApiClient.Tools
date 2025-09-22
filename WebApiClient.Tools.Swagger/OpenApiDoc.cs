@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -89,7 +90,16 @@ namespace WebApiClient.Tools.Swagger
         private static async Task<OpenApiDocument> FromUrlAsync(OpenApiDocOptions options,
             CancellationToken cancellationToken = default)
         {
-            var data = await DynamicApis.HttpGetAsync(options.OpenApi, cancellationToken).ConfigureAwait(false);
+            var handler = new HttpClientHandler();
+            if (options.BasicUserName != null && options.BasicPassword != null)
+            {
+                handler.Credentials = new System.Net.NetworkCredential(options.BasicUserName, options.BasicPassword);
+            }
+
+            using var client = new HttpClient(handler);
+            var response = await client.GetAsync(options.OpenApi, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            var data = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             // 移除BasePath
             if (!string.IsNullOrWhiteSpace(options.BasePath) && data.Contains($"\"{options.BasePath}/"))
